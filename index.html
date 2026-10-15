@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101820">
+<title>N'DOVAGO — Trova carburante</title>
+<!-- Podio nazionale: lettura dataset completo CSV, aggiornamento 2026-10-15 -->
+<style>
+:root{--bg:#101820;--panel:#182631;--text:#f4f7f9;--muted:#aebbc4;--yellow:#ffd43b;--line:#31434f;--orange:#ff9638;--blue:#55aaff;--green:#43d19e}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101820,#14232d 55%,#101820);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+header{padding:22px 18px 14px;max-width:760px;margin:auto}.brand{font-size:clamp(30px,8vw,42px);font-weight:900;letter-spacing:-1.7px;line-height:1}.brand .go{color:var(--yellow)}.tag{color:var(--muted);margin-top:9px}
+main{max-width:760px;margin:auto;padding:0 14px 36px}.card{background:rgba(24,38,49,.96);border:1px solid var(--line);border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 10px 28px #0002}
+label{display:block;font-weight:700;margin:0 0 7px}input,select,button{font:inherit}input,select{width:100%;padding:13px 12px;border-radius:11px;border:1px solid #465b68;background:#101b23;color:var(--text);outline:none}input:focus,select:focus{border-color:var(--yellow)}
+.row{display:grid;grid-template-columns:1fr;gap:12px}.btn{border:0;border-radius:12px;padding:13px 15px;font-weight:800;cursor:pointer;min-height:48px}.primary{background:var(--yellow);color:#171b1d}.secondary{background:#2a3d49;color:var(--text);border:1px solid #4a606d}.btn:disabled{opacity:.55;cursor:wait}
+.fuel-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.radius-options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.radius-btn{background:#101b23;border:1px solid #465b68;color:var(--text);padding:12px;border-radius:12px;font-weight:800}.radius-btn[aria-pressed=true]{outline:2px solid var(--yellow);border-color:var(--yellow)}.screen-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}.screen-btn{background:#2a3d49;color:var(--text);border:1px solid #4a606d;border-radius:12px;padding:12px;font-weight:800}.screen-btn[aria-pressed=true]{background:var(--yellow);color:#171b1d;border-color:var(--yellow)}.fuel{background:#101b23;border:1px solid #465b68;color:var(--text);padding:12px 4px;border-radius:12px;font-weight:800}.fuel[aria-pressed=true]{outline:2px solid var(--yellow);border-color:var(--yellow)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.orange{background:var(--orange)}.blue{background:var(--blue)}.green{background:var(--green)}
+.note,.muted{font-size:13px;color:var(--muted)}.note{margin-top:9px}.status{margin:12px 0 0;padding:12px;border-radius:10px;background:#101b23;color:var(--muted);white-space:pre-wrap}.results-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.results-head h2{font-size:20px;margin:0}.station{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;background:#14222b}.station-top{display:flex;justify-content:space-between;gap:12px}.station h3{margin:0 0 4px;font-size:17px}.price{font-size:23px;font-weight:900;color:var(--yellow);white-space:nowrap}.station .meta{font-size:13px;color:var(--muted);margin-top:6px}.station-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.station-actions a,.station-actions button{display:inline-block;text-decoration:none;background:#2a3d49;border:1px solid #4a606d;color:var(--text);padding:9px 12px;border-radius:10px;font-weight:700;font-size:14px}.station-actions button{cursor:pointer}.station-actions button.saved{background:#263d32;border-color:var(--green);color:#baf5d9}.fav-prices{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.fav-price{background:#101b23;border:1px solid #31434f;border-radius:10px;padding:9px 5px;text-align:center}.fav-price strong{display:block;font-size:12px;color:var(--muted)}.fav-price span{display:block;font-weight:900;margin-top:4px;font-size:14px}.empty{padding:20px 8px;color:var(--muted);text-align:center}.links a{color:var(--yellow)}
+.podium-fuels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.podium-fuel{background:#101b23;color:var(--text);border:1px solid #465b68;border-radius:11px;padding:11px 4px;font-weight:800}.podium-fuel[aria-pressed=true]{background:var(--yellow);color:#171b1d;border-color:var(--yellow)}.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end;margin:20px 0 12px}.podium-place{text-align:center;min-width:0}.medal{font-size:28px;line-height:1.2}.podium-name{font-size:12px;color:var(--muted);margin:5px 0;overflow-wrap:anywhere}.podium-step{display:flex;align-items:center;justify-content:center;color:#18212a;font-size:30px;font-weight:1000;border-radius:10px 10px 0 0}.podium-place.first .podium-step{height:112px;background:linear-gradient(145deg,#ffe77b,#e2ad17)}.podium-place.second .podium-step{height:82px;background:linear-gradient(145deg,#e1e7eb,#8c9ba6)}.podium-place.third .podium-step{height:62px;background:linear-gradient(145deg,#e8b083,#a75e32)}.podium-caption{font-size:13px;font-weight:800;margin-top:5px}.podium-info{background:#101b23;border-radius:12px;padding:12px;color:var(--muted);font-size:13px}.links a{color:var(--yellow)}footer{max-width:760px;margin:auto;padding:0 18px 30px;color:var(--muted);font-size:12px}
+@media(min-width:560px){.row.two{grid-template-columns:1fr 1fr}.row.actions{grid-template-columns:1fr 1fr}.station{padding:16px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span>N'DOVA</span><span class="go">GO</span></div><div class="tag">Trova il carburante più conveniente vicino a te.</div></header>
+<main>
+<nav class="screen-nav" aria-label="Schermate">
+  <button id="nav-search" class="screen-btn" aria-pressed="true">CERCA DISTRIBUTORI</button>
+  <button id="nav-favs" class="screen-btn" aria-pressed="false">I MIEI PREFERITI <span id="fav-count">(0/5)</span></button>
+</nav>
+<div id="search-screen">
+<section class="card">
+  <div class="row two">
+    <div><label for="origin">Da dove partiamo?</label><input id="origin" type="text" placeholder="Comune, via o indirizzo" autocomplete="street-address"></div>
+    <div style="align-self:end"><button id="gps" class="btn secondary" style="width:100%">◎ Usa la mia posizione</button></div>
+  </div>
+  <div style="margin-top:16px"><label>Quale carburante?</label><div class="fuel-options" role="group" aria-label="Tipo di carburante">
+    <button class="fuel" data-fuel="Benzina" aria-pressed="true"><span class="dot orange"></span>Benzina</button>
+    <button class="fuel" data-fuel="GPL" aria-pressed="false"><span class="dot blue"></span>GPL</button>
+    <button class="fuel" data-fuel="Metano" aria-pressed="false"><span class="dot green"></span>Metano</button>
+  </div></div>
+  <div style="margin-top:16px"><label>Raggio di ricerca</label><div class="radius-options" role="group" aria-label="Raggio di ricerca">
+    <button class="radius-btn" data-radius="10" aria-pressed="true">ENTRO 10 KM</button>
+    <button class="radius-btn" data-radius="20" aria-pressed="false">ENTRO 20 KM</button>
+  </div></div>
+  <div style="margin-top:16px"><label for="sort">Ordina i risultati</label><select id="sort"><option value="price">Prezzo più basso</option><option value="distance">Più vicino</option></select></div>
+  <div class="row actions" style="margin-top:16px"><button id="search" class="btn primary">Cerca entro 10 km</button><button id="clear" class="btn secondary">Azzera</button></div>
+  <div class="note">Massimo 5 risultati per ricerca. Puoi salvare fino a 5 distributori preferiti e consultare i prezzi di Benzina, GPL e Metano nella schermata dedicata.</div>
+  <div id="status" class="status" aria-live="polite">Inserisci un indirizzo oppure premi “Usa la mia posizione”. La posizione viene richiesta solo quando premi il pulsante GPS.</div>
+</section>
+<section class="card"><div class="results-head"><h2>Risultati</h2><span id="count" class="muted">0 distributori</span></div><div id="results"><div class="empty">I distributori trovati appariranno qui.</div></div></section>
+</div>
+<div id="favorites-screen" hidden>
+  <section class="card">
+    <div class="results-head"><h2>I miei preferiti</h2><span id="fav-count-heading" class="muted">0/5 salvati</span></div>
+    <p class="muted">Salva fino a 5 distributori dalla schermata di ricerca. Qui trovi i prezzi disponibili di Benzina, GPL e Metano.</p>
+    <div id="favorites-list"><div class="empty">Non hai ancora salvato distributori. Vai su “Cerca distributori” e premi “☆ Aggiungi ai preferiti”.</div></div>
+    <button id="refresh-favs" class="btn secondary" style="width:100%;margin-top:12px">AGGIORNA PREZZI DEI PREFERITI</button>
+    <div id="fav-status" class="status" aria-live="polite">I preferiti sono salvati su questo dispositivo.</div>
+  </section>
+</div>
+<section class="card links">
+  <strong>Confronta le fonti</strong>
+  <p class="muted">N'DOVAGO usa un'API pubblica basata sui dati MIMIT. Le fonti che ripubblicano il MIMIT possono condividere la stessa origine dei dati, quindi non sono necessariamente verifiche indipendenti.</p>
+  <p><a href="https://prezzibenzina.live/" target="_blank" rel="noopener">Apri PrezziBenzina.Live ↗</a></p>
+  <p><a href="https://www.prezzibenzina.it/" target="_blank" rel="noopener">Apri PrezziBenzina.it ↗</a></p>
+  <p><a href="https://mappacarburanti.it/api" target="_blank" rel="noopener">Dati e API Mappa Carburanti ↗</a></p>
+  <p><a href="https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" target="_blank" rel="noopener">Fonte ufficiale MIMIT ↗</a></p>
+</section>
+<section class="card" id="national-podium">
+  <div class="results-head"><h2>🏆 Il podio nazionale</h2><span class="muted">1° · 2° · 3°</span></div>
+  <p class="muted">Podio nazionale calcolato sui prezzi dei singoli impianti presenti nel dataset completo italiano, non sui soli minimi per città. I dati provengono dal MIMIT tramite Mappa Carburanti Italia.</p>
+  <div class="podium-fuels" role="group" aria-label="Carburante per il podio nazionale">
+    <button class="podium-fuel" data-podium-fuel="Metano" aria-pressed="true">METANO</button>
+    <button class="podium-fuel" data-podium-fuel="GPL" aria-pressed="false">GPL</button>
+    <button class="podium-fuel" data-podium-fuel="Benzina" aria-pressed="false">BENZINA</button>
+  </div>
+  <div class="podium" aria-label="Podio nazionale aggiornato dai dati pubblici">
+    <div class="podium-place second"><div class="medal">🥈</div><div class="podium-caption">ARGENTO</div><div class="podium-name" id="podium-name-2">In attesa di dati nazionali</div><div class="podium-step">2</div></div>
+    <div class="podium-place first"><div class="medal">🥇</div><div class="podium-caption">ORO</div><div class="podium-name" id="podium-name-1">In attesa di dati nazionali</div><div class="podium-step">1</div></div>
+    <div class="podium-place third"><div class="medal">🥉</div><div class="podium-caption">BRONZO</div><div class="podium-name" id="podium-name-3">In attesa di dati nazionali</div><div class="podium-step">3</div></div>
+  </div>
+  <div class="podium-info" id="podium-status" aria-live="polite">Caricamento del podio nazionale…</div><div id="podium-list" aria-live="polite"></div>
+  <div class="station-actions"><a href="https://prezzibenzina.live/" target="_blank" rel="noopener">Consulta PrezziBenzina.Live ↗</a><a href="https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" target="_blank" rel="noopener">Dati ufficiali MIMIT ↗</a></div>
+</section>
+</main>
+<footer>
+  Il podio nazionale legge il dump completo degli impianti pubblicato da Mappa Carburanti Italia, basato sui dati MIMIT (licenza CC0 dichiarata dalla fonte). La classifica comprende solo gli impianti e i prezzi effettivamente presenti nel file scaricato; i prezzi possono essere non aggiornati o mancanti. Verifica sempre il prezzo esposto alla pompa. La disponibilità del servizio esterno può cambiare.
+</footer>
+<script>
+const $=s=>document.querySelector(s);
+const API='https://prezzibenzina.live/api/v1';
+const NATIONAL_API='https://mappacarburanti.it/data/stazioni-italia.csv';
+const FUEL_TYPES=['Benzina','GPL','Metano'];
+let fuel='Benzina',radius=10,originPoint=null,lastStations=[];
+let favorites=loadFavorites();
+const statusEl=$('#status'),resultsEl=$('#results'),countEl=$('#count');
+function status(t){statusEl.textContent=t}
+function loadFavorites(){try{const x=JSON.parse(localStorage.getItem('ndovago-favorites')||'[]');return Array.isArray(x)?x.slice(0,5):[]}catch(e){return[]}}
+function saveFavorites(){try{localStorage.setItem('ndovago-favorites',JSON.stringify(favorites));}catch(e){} updateFavCount()}
+function updateFavCount(){$('#fav-count').textContent='('+favorites.length+'/5)';$('#fav-count-heading').textContent=favorites.length+'/5 salvati'}
+function showScreen(which){const search=which==='search';$('#search-screen').hidden=!search;$('#favorites-screen').hidden=search;$('#nav-search').setAttribute('aria-pressed',String(search));$('#nav-favs').setAttribute('aria-pressed',String(!search));if(!search)renderFavorites()}
+$('#nav-search').addEventListener('click',()=>showScreen('search'));
+$('#nav-favs').addEventListener('click',()=>showScreen('favorites'));
+document.querySelectorAll('.radius-btn').forEach(b=>b.addEventListener('click',()=>{radius=Number(b.dataset.radius);document.querySelectorAll('.radius-btn').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));$('#search').textContent='Cerca entro '+radius+' km';if(originPoint)status('Raggio selezionato: '+radius+' km. Premi Cerca per aggiornare i risultati.')}));
+document.querySelectorAll('.fuel').forEach(b=>b.addEventListener('click',()=>{fuel=b.dataset.fuel;document.querySelectorAll('.fuel').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));if(originPoint)status('Carburante selezionato: '+fuel+'. Premi “Cerca entro '+radius+' km” per aggiornare i risultati.')}));
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function priceText(s){const p=Number(s.prezzoUnitario);if(!Number.isFinite(p)||p<=0)return'Prezzo n.d.';return p.toLocaleString('it-IT',{minimumFractionDigits:3,maximumFractionDigits:3})+' €/'+(s.unita==='kg'?'kg':'L')}
+function dateText(s){if(!s.aggiornato)return'';return 'Aggiornato: '+s.aggiornato}
+function mapsUrl(s){return s.mapsUrl||('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(s.lat+','+s.lon))}
+function distance(s){const n=Number(s.distanzaStradaKm);return Number.isFinite(n)?n:null}
+function render(stations){
+ let list=[...stations];
+ list.sort((a,b)=>$('#sort').value==='distance'?(distance(a)??Infinity)-(distance(b)??Infinity):(Number(a.prezzoUnitario)||Infinity)-(Number(b.prezzoUnitario)||Infinity));
+ list=list.slice(0,5);lastStations=stations;
+ countEl.textContent=list.length+' distributori';
+ if(!list.length){resultsEl.innerHTML='<div class="empty">Nessun distributore con prezzo disponibile trovato entro '+radius+' km. Prova un altro punto di partenza.</div>';return}
+ resultsEl.innerHTML=list.map((s,i)=>{
+  const d=distance(s),mode=s.self===true?'Self-service':s.self===false?'Servito':'Modalità n.d.';
+  const addr=[s.indirizzo,s.comune].filter(Boolean).join(', ');
+  const isFav=favorites.some(f=>sameStation(f,s));
+  return `<article class="station"><div class="station-top"><div><h3>${i+1}. ${esc(s.bandiera||s.nome||'Distributore')}</h3><div class="muted">${esc(s.nome||'')}</div></div><div class="price">${esc(priceText(s))}</div></div><div class="meta">${esc(addr||'Indirizzo non disponibile')}<br>${d!==null?d.toLocaleString('it-IT',{maximumFractionDigits:1})+' km · ':''}${esc(mode)}${s.aggiornato?'<br>'+esc(dateText(s)):''}</div><div class="station-actions"><a href="${mapsUrl(s)}" target="_blank" rel="noopener">Portami lì ↗</a><button class="${isFav?'saved':''}" data-fav-index="${i}">${isFav?'✓ Nei preferiti':'☆ Aggiungi ai preferiti'}</button></div></article>`;
+ }).join('');
+ resultsEl.querySelectorAll('[data-fav-index]').forEach(btn=>btn.addEventListener('click',()=>toggleFavorite(list[Number(btn.dataset.favIndex)])));
+}
+function sameStation(a,b){
+ if(!a||!b)return false;
+ if(a.id!=null&&b.id!=null&&String(a.id)===String(b.id))return true;
+ const na=String(a.nome||a.bandiera||'').trim().toLowerCase(),nb=String(b.nome||b.bandiera||'').trim().toLowerCase();
+ const aa=String(a.indirizzo||'').trim().toLowerCase(),ab=String(b.indirizzo||'').trim().toLowerCase();
+ if(na&&nb&&na===nb&&aa===ab)return true;
+ const alat=Number(a.lat),alon=Number(a.lon),blat=Number(b.lat),blon=Number(b.lon);
+ return [alat,alon,blat,blon].every(Number.isFinite)&&Math.abs(alat-blat)<0.0002&&Math.abs(alon-blon)<0.0002;
+}
+function toggleFavorite(s){
+ if(!s)return;
+ const idx=favorites.findIndex(f=>sameStation(f,s));
+ if(idx>=0){favorites.splice(idx,1);saveFavorites();render(lastStations);renderFavorites();return}
+ if(favorites.length>=5){status('Hai già 5 preferiti. Rimuovine uno dalla schermata “I miei preferiti” per aggiungerne un altro.');return}
+ favorites.push({...s,_savedAt:Date.now()});saveFavorites();render(lastStations);renderFavorites();status('Distributore aggiunto ai preferiti.');
+}
+async function fetchStations(point,type,km,limit=20){
+ // L'API pubblica accetta raggio massimo 15 km e limite massimo 20 risultati.
+ // Per una ricerca da 20 km interroghiamo più punti vicini e uniamo i risultati.
+ const safeLimit=Math.max(1,Math.min(20,Number(limit)||20));
+ async function oneSearch(center,searchRadius){
+  const params=new URLSearchParams({lat:String(center.lat),lon:String(center.lon),carburante:type,raggio:String(searchRadius),limite:String(safeLimit)});
+  const r=await fetch(API+'/stazioni?'+params.toString(),{headers:{'Accept':'application/json'}});
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok)throw Error(data.detail||data.title||('Servizio prezzi non disponibile (HTTP '+r.status+').'));
+  return Array.isArray(data.stazioni)?data.stazioni:[];
+ }
+ if(Number(km)<=15)return oneSearch(point,Math.max(1,Number(km)||10));
+ // Copertura del cerchio di 20 km con centri a 5 km e intervallo angolare di 22,5°.
+ // Ogni chiamata resta entro i limiti documentati dell'API (15 km, massimo 20 risultati).
+ const centers=[point];
+ const earthKm=111.32;
+ for(let deg=0;deg<360;deg+=22.5){
+  const rad=deg*Math.PI/180,offset=6;
+  const lat=Number(point.lat)+Math.cos(rad)*offset/earthKm;
+  const lon=Number(point.lon)+Math.sin(rad)*offset/(earthKm*Math.cos(Number(point.lat)*Math.PI/180));
+  centers.push({lat,lon});
+ }
+ const groups=await Promise.all(centers.map(c=>oneSearch(c,15)));
+ const merged=new Map();
+ for(const station of groups.flat()){
+  const key=station.id!=null?'id:'+station.id:[String(station.nome||station.bandiera||'').trim().toLowerCase(),String(station.indirizzo||'').trim().toLowerCase(),String(station.comune||'').trim().toLowerCase()].join('|');
+  if(!merged.has(key))merged.set(key,station);
+ }
+ function straightKm(a,b){
+  const toRad=x=>x*Math.PI/180, dLat=toRad(Number(b.lat)-Number(a.lat)),dLon=toRad(Number(b.lon)-Number(a.lon));
+  const x=Math.sin(dLat/2)**2+Math.cos(toRad(Number(a.lat)))*Math.cos(toRad(Number(b.lat)))*Math.sin(dLon/2)**2;
+  return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(Math.max(0,1-x)));
+ }
+ return [...merged.values()].filter(s=>Number.isFinite(Number(s.lat))&&Number.isFinite(Number(s.lon))&&straightKm(point,s)<=20.5).slice(0,400);
+}
+function renderFavorites(){
+ updateFavCount();const box=$('#favorites-list');
+ if(!favorites.length){box.innerHTML='<div class="empty">Non hai ancora salvato distributori. Vai su “Cerca distributori” e premi “☆ Aggiungi ai preferiti”.</div>';$('#fav-status').textContent='I preferiti sono salvati su questo dispositivo.';return}
+ box.innerHTML=favorites.map((s,i)=>`<article class="station" data-fav-card="${i}"><div class="station-top"><div><h3>${esc(s.bandiera||s.nome||'Distributore')}</h3><div class="muted">${esc([s.indirizzo,s.comune].filter(Boolean).join(', ')||'Indirizzo non disponibile')}</div></div><div class="price">${esc(priceText(s))}</div></div><div class="fav-prices"><div class="fav-price"><strong>BENZINA</strong><span data-fuel-price="Benzina">—</span></div><div class="fav-price"><strong>GPL</strong><span data-fuel-price="GPL">—</span></div><div class="fav-price"><strong>METANO</strong><span data-fuel-price="Metano">—</span></div></div><div class="meta">${s.aggiornato?'Ultimo aggiornamento: '+esc(s.aggiornato):'Data aggiornamento non disponibile'}</div><div class="station-actions"><a href="${mapsUrl(s)}" target="_blank" rel="noopener">Portami lì ↗</a><button data-remove-fav="${i}">✕ Rimuovi</button></div></article>`).join('');
+ box.querySelectorAll('[data-remove-fav]').forEach(b=>b.addEventListener('click',()=>{favorites.splice(Number(b.dataset.removeFav),1);saveFavorites();renderFavorites();if(lastStations.length)render(lastStations)}));
+ refreshFavoritePrices();
+}
+async function refreshFavoritePrices(){
+ if(!favorites.length)return;const box=$('#favorites-list');$('#fav-status').textContent='Aggiornamento dei prezzi in corso…';
+ const snapshot=favorites.map(s=>({...s}));
+ for(let i=0;i<snapshot.length;i++){
+  const station=snapshot[i],card=box.querySelector('[data-fav-card="'+i+'"]');if(!card)continue;
+  for(const type of FUEL_TYPES){
+   const target=card.querySelector('[data-fuel-price="'+type+'"]');if(!target)continue;
+   try{
+    const lat=Number(station.lat),lon=Number(station.lon);
+    if(!Number.isFinite(lat)||!Number.isFinite(lon)){target.textContent='N/D';continue}
+    const nearby=await fetchStations({lat,lon},type,2,20);
+    let match=nearby.find(x=>sameStation(station,x));
+    if(!match&&station.id!=null)match=nearby.find(x=>String(x.id)===String(station.id));
+    target.textContent=match&&Number(match.prezzoUnitario)>0?priceText(match):'N/D';
+   }catch(e){target.textContent='N/D'}
+  }
+ }
+ $('#fav-status').textContent='Prezzi mostrati solo quando la fonte restituisce un dato verificabile. N/D significa prezzo non disponibile o stazione non riconosciuta per quel carburante.';
+}
+$('#refresh-favs').addEventListener('click',refreshFavoritePrices);
+async function geocode(q){
+ const r=await fetch(API+'/geocode?luogo='+encodeURIComponent(q),{headers:{'Accept':'application/json'}});
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)throw Error(data.detail||'Il servizio di ricerca indirizzi non è disponibile.');
+ const place=data.risultati&&data.risultati[0];
+ if(!place)throw Error('Indirizzo non trovato. Prova con comune e via.');
+ return{lat:Number(place.lat),lon:Number(place.lon),label:place.nome||q};
+}
+async function searchPoint(point){
+ $('#search').disabled=true;status('Cerco i prezzi dei distributori entro '+radius+' km…');
+ try{
+  const dataStations=await fetchStations(point,fuel,radius,20);
+  let stations=Array.isArray(dataStations)?dataStations:[];
+  stations=stations.filter(s=>Number(s.prezzoUnitario)>0);
+  render(stations);
+  status(stations.length?'Dati ricevuti dalla fonte pubblica basata sul MIMIT. I prezzi possono cambiare durante la giornata.':'Nessun prezzo disponibile per '+fuel+' nel raggio di '+radius+' km.');
+ }catch(e){resultsEl.innerHTML='<div class="empty">Non è stato possibile caricare i prezzi. Controlla la connessione e riprova.</div>';countEl.textContent='0 distributori';status('Errore nel caricamento: '+(e.message||'problema di rete')+'\nFonte: PrezziBenzina.Live API.')}
+ finally{$('#search').disabled=false}
+}
+$('#gps').addEventListener('click',()=>{
+ if(!navigator.geolocation){status('Il dispositivo non supporta la geolocalizzazione. Inserisci un indirizzo.');return}
+ status('Richiesta posizione in corso…');
+ navigator.geolocation.getCurrentPosition(pos=>{originPoint={lat:pos.coords.latitude,lon:pos.coords.longitude};$('#origin').value='Posizione attuale';searchPoint(originPoint)},err=>status(err.code===1?'Permesso posizione negato. Puoi inserire manualmente un indirizzo.':'Posizione non disponibile. Controlla GPS e permessi, oppure inserisci un indirizzo.'),{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+});
+$('#search').addEventListener('click',async()=>{
+ const q=$('#origin').value.trim();
+ if(!q||q==='Posizione attuale'){if(originPoint){searchPoint(originPoint);return}status('Inserisci un comune o indirizzo oppure premi “Usa la mia posizione”.');return}
+ $('#search').disabled=true;
+ try{const p=await geocode(q);originPoint=p;await searchPoint(p)}
+ catch(e){status(e.message||'Non riesco a trovare questo indirizzo.')}
+ finally{$('#search').disabled=false}
+});
+$('#sort').addEventListener('change',()=>{if(lastStations.length)render(lastStations)});
+$('#clear').addEventListener('click',()=>{$('#origin').value='';originPoint=null;lastStations=[];resultsEl.innerHTML='<div class="empty">I distributori trovati appariranno qui.</div>';countEl.textContent='0 distributori';status('Inserisci un indirizzo oppure premi “Usa la mia posizione”. La posizione viene richiesta solo quando premi il pulsante GPS.')});
+updateFavCount();
+
+let podiumFuel='Metano',nationalSnapshot=null;
+// Dopo aver creato il Worker, sostituisci l'URL qui sotto con il suo indirizzo completo + /podio.
+const PODIUM_API='https://INSERISCI-URL-WORKER.workers.dev/podio';
+function euroPrice(v,type){return Number(v).toLocaleString('it-IT',{minimumFractionDigits:3,maximumFractionDigits:3})+(type==='Metano'?' €/kg':' €/l');}
+function nationalMapUrl(item){
+ const q=[item.address,item.city,item.province,'Italia'].filter(Boolean).join(', ')||[item.lat,item.lon].filter(v=>v!==''&&v!=null).join(',');
+ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+}
+function renderNationalPodium(){
+ const status=$('#podium-status'),list=$('#podium-list');
+ if(!nationalSnapshot){status.textContent='Podio nazionale non ancora disponibile.';return;}
+ const top=(nationalSnapshot.fuels&&nationalSnapshot.fuels[podiumFuel])||[];
+ const allCount=(nationalSnapshot.counts&&nationalSnapshot.counts[podiumFuel])||0;
+ [1,2,3].forEach(rank=>{const item=top[rank-1];$('#podium-name-'+rank).textContent=item?(item.brand+' · '+(item.city||item.province||'Italia')):'Nessun dato valido'});
+ const date=nationalSnapshot.dataDate||'data non indicata';
+ status.textContent=top.length?'Podio nazionale calcolato su '+Number(allCount).toLocaleString('it-IT')+' impianti con prezzo valido per '+podiumFuel+'. Data dati: '+date+'. Fonte: Mappa Carburanti Italia, dati derivati dal MIMIT.':'Nessun prezzo valido per '+podiumFuel+' nel dataset ricevuto.';
+ list.innerHTML=top.map((item,i)=>`<article class="station"><div class="station-top"><div><h3>${['🥇','🥈','🥉'][i]} ${esc(item.brand||'Distributore')}</h3><div class="muted">${esc([item.city,item.province?'('+item.province+')':''].filter(Boolean).join(' ')||'Italia')}</div><div class="muted">${esc(item.address||'Indirizzo non disponibile')}</div></div><div class="price">${esc(euroPrice(item.price,podiumFuel))}</div></div><div class="meta">${item.date?'Prezzo comunicato: '+esc(item.date):'Data del singolo prezzo non disponibile'}${item.mode?' · '+esc(item.mode):''} · Fonte: Mappa Carburanti Italia / MIMIT</div><div class="station-actions"><a href="${nationalMapUrl(item)}" target="_blank" rel="noopener">Portami lì ↗</a><a href="https://mappacarburanti.it/api/" target="_blank" rel="noopener">Fonte dati ↗</a></div></article>`).join('')||'<div class="empty">Nessun prezzo utilizzabile disponibile per questo carburante.</div>';
+}
+async function loadNationalPodium(){
+ const status=$('#podium-status'),list=$('#podium-list');
+ if(PODIUM_API.includes('INSERISCI-URL-WORKER')){
+  status.textContent='Il podio nazionale è pronto da collegare. Dopo aver creato il Worker Cloudflare, inserisci il suo URL nella costante PODIUM_API in questo file HTML.';
+  list.innerHTML='';return;
+ }
+ status.textContent='Caricamento del podio nazionale…';
+ try{
+  const response=await fetch(PODIUM_API,{headers:{'Accept':'application/json'},cache:'no-store'});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||!data.ok)throw Error(data.error||('Servizio podio non disponibile (HTTP '+response.status+').'));
+  nationalSnapshot=data;renderNationalPodium();
+  if(data.updatedAt)status.textContent+=' Ultimo aggiornamento archivio: '+new Date(data.updatedAt).toLocaleString('it-IT')+'.';
+ }catch(error){
+  status.textContent='Non riesco a caricare il podio nazionale dal Worker ('+(error&&error.message?error.message:'errore di rete')+'). Verifica URL, distribuzione e binding KV. Nessun prezzo viene inventato.';
+  list.innerHTML='';
+ }
+}
+document.querySelectorAll('[data-podium-fuel]').forEach(btn=>btn.addEventListener('click',()=>{
+ podiumFuel=btn.dataset.podiumFuel;
+ document.querySelectorAll('[data-podium-fuel]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
+ renderNationalPodium();
+}));
+loadNationalPodium();
+</script>
+</body>
+</html>
